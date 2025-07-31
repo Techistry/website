@@ -57,6 +57,11 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🔐 Create .env file
+        run: |
+          echo "VITE_BASE_URL_DEV=${{ secrets.VITE_BASE_URL_DEV }}" >> .env
+          echo "VITE_BASE_URL_PROD=${{ secrets.VITE_BASE_URL_PROD }}" >> .env
+
       - name: 🧱 Install Dependencies
         run: npm install --legacy-peer-deps
 
