@@ -40,11 +40,12 @@ const ExplorePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const getCategories = async () => {
+    console.log(api);
     try {
       const response = await api.get("/api/category/all");
       if (response.data.success) {
         setCategories(response.data.data);
-        console.log(api);
+
         return;
       }
     } catch (error: any) {
