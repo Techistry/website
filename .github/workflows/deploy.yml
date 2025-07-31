@@ -58,7 +58,7 @@ jobs:
           node-version: 18
 
       - name: 🧪 Copy .env
-        run: cp .env.production .env
+        run: cp .env .env
 
       - name: 🧱 Install Dependencies
         run: npm install --legacy-peer-deps
