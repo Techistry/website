@@ -220,7 +220,7 @@ const ExplorePage = () => {
                 color: activeTab === "all" ? "#0167C4" : "#00000A",
               }}
             >
-              all
+              All
             </Typography>
           </li>
           {categories?.map((tab) => (
