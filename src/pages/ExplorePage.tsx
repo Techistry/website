@@ -40,7 +40,7 @@ const ExplorePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const getCategories = async () => {
-    console.log("api is", api);
+    console.log("PROD BASE URL:", import.meta.env.VITE_BASE_URL_PROD);
     try {
       const response = await api.get("/api/category/all");
       if (response.data.success) {
