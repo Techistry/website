@@ -73,17 +73,18 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Clean out everything except dist/
+          # Prepare the new clean deploy folder
           mkdir temp && cp -r dist/* temp/ && cd temp
 
           git init
-
-          # Ensure no divergence: delete old deploy branch
-          git fetch origin
-          git push https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository }} --delete deploy || true
-
           git checkout -b deploy
+
+          # Add origin first before using it
           git remote add origin https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository }}
+
+          # Delete old deploy branch if it exists (prevents divergence)
+          git fetch origin
+          git push origin --delete deploy || true
 
           git add .
           git commit -m "Deploy built site from ${{ github.sha }}"
