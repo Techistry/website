@@ -34,13 +34,16 @@ const ExplorePage = () => {
 
   const [activeTab, setActiveTab] = useState("all");
   const [loading, setLoading] = useState(false);
+  const [loadingTools, setLoadingTools] = useState(false);
 
   const [categories, setCategories] = useState<CategoryDetails[]>();
-  const [tools, setTools] = useState<ToolState[]>();
+  const [tools, setTools] = useState<ToolState[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [searchQuery, setSearchQuery] = useState("");
 
   const getCategories = async () => {
-    console.log("PROD BASE URL:", import.meta.env.VITE_BASE_URL_PROD);
     try {
       const response = await api.get("/api/category/all");
       if (response.data.success) {
@@ -53,24 +56,65 @@ const ExplorePage = () => {
     }
   };
 
-  const getTools = async () => {
+  const getTools = async (currentPage = page) => {
     try {
       setLoading(true);
-      const response = await api.get("/api/tool/all");
+      setLoadingTools(true);
+
+      const skip = (currentPage - 1) * limit;
+      const response = await api.get(
+        `/api/tool/all?limit=${limit}&skip=${skip}`
+      );
+
       if (response.data.success) {
-        setTools(response.data.data);
-        setLoading(false);
-        return;
+        setTools((prev) =>
+          currentPage === 1
+            ? response.data.data
+            : [...prev, ...response.data.data]
+        );
+        setHasMore(response.data.hasMore);
       }
-    } catch (error: any) {
-      console.error(error);
+    } catch (error) {
+      console.error("Error loading tools:", error);
+    } finally {
+      setLoading(false);
+      setLoadingTools(false);
     }
   };
-
   useEffect(() => {
     getCategories();
-    getTools();
+
+    setTools([]);
+    setPage(1);
+    setHasMore(true);
+
+    getTools(1);
   }, []);
+
+  useEffect(() => {
+    if (page !== 1) {
+      getTools(page);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      if (
+        scrollTop + windowHeight >= documentHeight - 100 &&
+        hasMore &&
+        !loading
+      ) {
+        setPage((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMore, loading]);
 
   const renderSkeletonCards = () => {
     return Array.from({ length: 6 }).map((_, index) => (
@@ -263,7 +307,7 @@ const ExplorePage = () => {
                 )
                 .map((tool) => (
                   <div
-                    key={tool.name}
+                    key={tool._id}
                     onClick={() => navigate(`/view/tool/${tool._id}`)}
                     className="bg-[#F2F2F3] rounded-[25px] flex flex-col items-center text-center gap-[15px] px-4 py-[40px] w-full max-w-[296px] mx-auto cursor-pointer
               hover:bg-[#E7F3FD] hover:scale-105 hover:border-2 hover:border-[#0167C4] transition-all duration-300 ease-in-out"
@@ -284,6 +328,15 @@ const ExplorePage = () => {
                     </Typography>
                   </div>
                 ))}
+
+          {loadingTools && (
+            <div className="text-center my-4">Loading more tools...</div>
+          )}
+          {!hasMore && (
+            <div className="text-center my-4 text-gray-500">
+              No more tools to load.
+            </div>
+          )}
         </div>
       </div>
 
