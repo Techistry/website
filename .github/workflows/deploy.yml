@@ -72,7 +72,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config pull.rebase false  # 👈 ADD THIS LINE to choose merge strategy
+          git config pull.rebase false 
 
           mkdir temp && cp -r dist/* temp/ && cd temp
 
@@ -80,7 +80,7 @@ jobs:
           git checkout -b deploy
 
           git remote add origin https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository }}
-          git pull origin deploy --rebase || echo "No existing deploy branch"  # Optional fallback
+          git pull origin deploy --rebase || echo "No existing deploy branch"
 
           git add .
           git commit -m "Deploy built site from ${{ github.sha }}"
