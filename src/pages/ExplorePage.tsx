@@ -316,6 +316,7 @@ const ExplorePage = () => {
                       src={tool.image}
                       className="w-[150px] h-[150px]"
                       alt={tool.name}
+                      crossOrigin="anonymous"
                     />
                     <Typography fontWeight={400} fontSize={24} color="black">
                       {tool.name}
